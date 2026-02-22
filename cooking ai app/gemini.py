@@ -16,7 +16,7 @@ def generate(content):
     )
 
     # Consider dropping to gemini-2.5-flash if 3-flash-preview still hits limits
-    model = "gemini-3-flash-preview" 
+    model = "gemini-3-flash-preview"
     
     # We enforce JSON output so it plugs perfectly into your frontend JavaScript
     generate_content_config = types.GenerateContentConfig(
@@ -40,12 +40,16 @@ def generate(content):
             config=generate_content_config,
         )
         
-        # Attempt to parse the response text as JSON
-        json_output = json.loads(response.text) # Ensure response.text is used
-        logging.info(f"Gemini AI JSON Output:\n{json.dumps(json_output, indent=2)}") # Use logging
-        return json_output # Return the parsed JSON object
+        try:
+            # Attempt to parse the response text as JSON
+            json_output = json.loads(response.text) # Ensure response.text is used
+            logging.info(f"Gemini AI JSON Output:\n{json.dumps(json_output, indent=2)}") # Use logging
+            return json_output # Return the parsed JSON object
+        except json.JSONDecodeError as json_e:
+            logging.error(f"JSON parsing error: {json_e}. Raw response text: {response.text}")
+            return None
     except Exception as e:
-        logging.error(f"Error calling Gemini API or parsing response: {e}") # Use logging for errors
+        logging.error(f"Error calling Gemini API: {e}") # Use logging for errors
         return None # Or raise the exception, depending on desired error handling
 
 if __name__ == "__main__":
