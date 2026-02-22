@@ -1,9 +1,8 @@
-# Updated app.py
 from flask import Flask, request, jsonify
 from flask_cors import CORS # You may need to pip install flask-cors
-import requests
+import requests # Keep requests for web scraping
 from bs4 import BeautifulSoup
-import gemini
+import gemini # Import the entire gemini module
 import logging # Import logging
 
 app = Flask(__name__)
@@ -53,6 +52,30 @@ def parse_recipe():
     except Exception as e:
         logging.exception("An unexpected error occurred during Gemini processing.") # Logs traceback
         return jsonify({"error": f"An unexpected server error occurred: {str(e)}"}), 500 #
+
+@app.route('/ask-recipe', methods=['POST'])
+def ask_recipe():
+    data = request.get_json()
+    question = data.get('question')
+    # It's crucial that the frontend sends the previously parsed recipe JSON
+    # so the LLM has context for the question.
+    parsed_recipe = data.get('parsedRecipe') 
+
+    if not question or not parsed_recipe:
+        logging.warning("Missing 'question' or 'parsedRecipe' in /ask-recipe request.")
+        return jsonify({"error": "Missing 'question' or 'parsedRecipe'"}), 400
+
+    try:
+        # Call the new Gemini function to answer the question about the recipe
+        ai_answer = gemini.answer_question_about_recipe(question, parsed_recipe)
+
+        if ai_answer:
+            return jsonify(ai_answer), 200
+        else:
+            return jsonify({"error": "AI failed to answer the question. Check server logs for details."}), 500
+    except Exception as e:
+        logging.exception("An unexpected error occurred during Gemini question answering.")
+        return jsonify({"error": f"An unexpected server error occurred: {str(e)}"}), 500
 
 if __name__ == '__main__':
     # Starts the server on http://127.0.0.1:5000

@@ -2,4 +2,5 @@ flask
 requests
 beautifulsoup4
 flask-cors
-google-generativeai
+google-genai
+playsound==1.2.2

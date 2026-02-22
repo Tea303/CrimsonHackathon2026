@@ -1,5 +1,6 @@
 import requests
 from playsound import playsound #pip install playsound==1.2.2
+import os # Import the os module for path manipulation
 
 ELEVENLABS_API_KEY = "sk_09bc2162234b0d86624fe4688fc7edd77efd45385b16eb1f"
 VOICE_ID = "EXAVITQu4vr4xnSDxMaL"
@@ -21,13 +22,17 @@ def test_elevenlabs():
     response = requests.post(url, json=payload, headers=headers)
 
     if response.status_code == 200:
-        with open("output.mp3", "wb") as f:
+        # Construct the full path to output.mp3 in the same directory as the script
+        script_dir = os.path.dirname(__file__)
+        output_file_path = os.path.join(script_dir, "output.mp3")
+
+        with open(output_file_path, "wb") as f:
             f.write(response.content)
 
-        print("✅ SUCCESS — output.mp3 created")
+        print(f"✅ SUCCESS — {output_file_path} created")
         print("🔊 Playing audio...")
 
-        playsound("output.mp3")
+        playsound(output_file_path)
     else:
         print("❌ ERROR:", response.status_code)
         print(response.text)

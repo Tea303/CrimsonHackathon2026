@@ -1,8 +1,8 @@
 import os
 import json
 import logging # Import the logging module
-import google.generativeai as genai
-from google.generativeai import types
+from google import genai
+from google.genai import types
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
@@ -51,6 +51,50 @@ def generate(content):
     except Exception as e:
         logging.error(f"Error calling Gemini API: {e}") # Use logging for errors
         return None # Or raise the exception, depending on desired error handling
+
+def answer_question_about_recipe(question: str, parsed_recipe_json: dict):
+    """
+    Answers a question about a recipe using the Gemini API.
+
+    Args:
+        question (str): The user's question about the recipe.
+        parsed_recipe_json (dict): The previously parsed recipe in JSON format.
+
+    Returns:
+        dict: A JSON object containing the answer, or None if an error occurs.
+    """
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key:
+        logging.error("GEMINI_API_KEY environment variable not set for ask_recipe_question.")
+        return None
+
+    client = genai.Client(api_key=api_key)
+    model = "gemini-3-flash-preview" # Or "gemini-1.5-flash" as a fallback
+
+    generate_content_config = types.GenerateContentConfig(
+        response_mime_type="application/json",
+        temperature=0.5, # A slightly higher temperature for more conversational answers
+    )
+
+    # Convert the parsed recipe JSON back to a string for the prompt
+    recipe_str = json.dumps(parsed_recipe_json, indent=2)
+
+    prompt = f"""Based on the following recipe, answer the user's question.
+    If the answer is not directly available in the recipe, state that.
+    Format your response as JSON with a single key: "answer".
+
+    RECIPE:
+    {recipe_str}
+
+    QUESTION: {question}
+    """
+
+    try:
+        response = client.models.generate_content(model=model, contents=prompt, config=generate_content_config)
+        return json.loads(response.text)
+    except Exception as e:
+        logging.error(f"Error calling Gemini API for question answering: {e}")
+        return None
 
 if __name__ == "__main__":
     # Test it with a tiny payload first!
