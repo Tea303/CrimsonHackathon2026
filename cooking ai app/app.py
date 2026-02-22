@@ -4,6 +4,7 @@ import requests # Keep requests for web scraping
 from bs4 import BeautifulSoup
 import gemini # Import the entire gemini module
 import logging # Import logging
+import json
 
 app = Flask(__name__)
 CORS(app) # Mitigates Cross-Origin Resource Sharing errorss
@@ -11,8 +12,32 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 @app.route('/parse-recipe', methods=['POST'])
 def parse_recipe():
+    for script in soup.find_all('script', type='application/ld+json'):
+        try:
+            data = json.loads(script.string)
+            # JSON-LD can be a list or a dict. Search for the "Recipe" schema.
+            if isinstance(data, list):
+                for item in data:
+                    if item.get('@type') == 'Recipe':
+                        return jsonify({
+                            "title": item.get('name'),
+                            "ingredients": item.get('recipeIngredient'),
+                            "steps": [step.get('text') for step in item.get('recipeInstructions', [])]
+                        }), 200
+            elif data.get('@type') == 'Recipe':
+                 return jsonify({
+                     "title": data.get('name'),
+                     "ingredients": data.get('recipeIngredient'),
+                     "steps": [step.get('text') for step in data.get('recipeInstructions', [])]
+                 }), 200
+        except Exception:
+            continue # If JSON-LD fails, fallback to Gemini
+
     # 1. Extract the URL sent by JavaScript
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid or missing JSON body"}), 400
+
     target_url = data.get('url')
 
     if not target_url:
@@ -56,6 +81,9 @@ def parse_recipe():
 @app.route('/ask-recipe', methods=['POST'])
 def ask_recipe():
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid or missing JSON body"}), 400
+
     question = data.get('question')
     # It's crucial that the frontend sends the previously parsed recipe JSON
     # so the LLM has context for the question.
@@ -78,5 +106,5 @@ def ask_recipe():
         return jsonify({"error": f"An unexpected server error occurred: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    # Starts the server on http://127.0.0.1:5000
-    app.run(debug=True)
+    # Keep debug=True for error logs, but turn off the reloader
+    app.run(debug=True, use_reloader=False)
