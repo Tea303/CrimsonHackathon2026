@@ -31,7 +31,7 @@ if response.status_code == 200:
     cleaned_content = soup.get_text(separator='\n', strip=True)
 
     print("--- Cleaned Text Content for Gemini (Snippet) ---")
-    print(cleaned_content[:5000] + "...") 
+    print(cleaned_content[:500] + "...") 
     print("-------------------------------------------------")
 
     # Call the Gemini AI to process the scraped text
