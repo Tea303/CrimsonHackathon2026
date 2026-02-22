@@ -116,7 +116,7 @@ if __name__ == "__main__":
     # Test it with a tiny payload first!
     print("--- Testing Recipe Parsing ---")
     recipe_data = generate("<html><body><h1>Test Recipe</h1><ul><li>Ingredient 1</li></ul><ol><li>Step 1</li></ol></body></html>")
-    
+        
     if recipe_data:
         print("\n--- Testing Question Answering ---")
         answer = answer_question_about_recipe("What is the first step?", recipe_data)
