@@ -1,7 +1,10 @@
 import os
 from google import genai
 from google.genai import types
-import json # Import the json module for parsing
+import json
+import logging # Import the logging module
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 def generate(content):
     api_key = os.environ.get("GEMINI_API_KEY")
@@ -38,11 +41,11 @@ def generate(content):
         )
         
         # Attempt to parse the response text as JSON
-        json_output = json.loads(response.text)
-        print(json.dumps(json_output, indent=2)) # Pretty print the JSON
+        json_output = json.loads(response.text) # Ensure response.text is used
+        logging.info(f"Gemini AI JSON Output:\n{json.dumps(json_output, indent=2)}") # Use logging
         return json_output # Return the parsed JSON object
     except Exception as e:
-        print(f"Error calling Gemini API or parsing response: {e}")
+        logging.error(f"Error calling Gemini API or parsing response: {e}") # Use logging for errors
         return None # Or raise the exception, depending on desired error handling
 
 if __name__ == "__main__":
