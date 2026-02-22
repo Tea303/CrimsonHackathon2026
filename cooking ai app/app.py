@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-from flask_cors import CORS # You may need to pip install flask-cors
+from flask_cors import CORS
 import requests # Keep requests for web scraping
 from bs4 import BeautifulSoup
 import gemini # Import the entire gemini module
