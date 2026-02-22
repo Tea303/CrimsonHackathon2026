@@ -7,7 +7,7 @@ import gemini
 import logging # Import logging
 
 app = Flask(__name__)
-CORS(app) # Mitigates Cross-Origin Resource Sharing errors
+CORS(app) # Mitigates Cross-Origin Resource Sharing errorss
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s') # Configure logging for app.py
 
 @app.route('/parse-recipe', methods=['POST'])
