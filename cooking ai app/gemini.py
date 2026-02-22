@@ -30,7 +30,7 @@ def generate(content):
     )
 
     # Consider dropping to gemini-2.5-flash if 3-flash-preview still hits limits
-    model = "gemini-2.5-flash-lite"
+    model = "gemini-2-flash-lite"
     
     # We enforce JSON output so it plugs perfectly into your frontend JavaScript
     generate_content_config = types.GenerateContentConfig(
