@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Unclutter</title>
+  <title>Unclutter | Clean Recipes</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../static/style.css" />
 </head>
 <body>
@@ -12,26 +15,21 @@
       <h1>Unclutter</h1>
     </div>
   </header>
-
+  
   <main class="main-content">
-    <!-- Landing / Info section -->
-    <section id="heroSection" class="panel">
+    <section id="heroSection" class="hero">
       <img src="../static/unclutter-logo.png" alt="Unclutter logo" class="logo-large" />
-      <h2>Clean recipes. No fluff.</h2>
+      <h2>Clean recipes.<br/>No fluff.</h2>
       <p>
         Paste any cooking recipe URL and Unclutter will pull out the important parts:
-        ingredients, steps, and key details - no ads, no clutter.
+        ingredients, steps, and key details - no ads, no life stories.
       </p>
       <p>
-        After that, ask follow-up questions like substitutions, cook time, or serving size.
-      </p>
-      <p>
-        You can click on the ingredients to mark them as completed while cooking. Happy cooking!
+        After that, ask follow-up questions like substitutions, cook time, or serving sizes.
       </p>
     </section>
-
-    <!-- Recipe section (hidden at first) -->
-    <section id="recipeSection" class="panel hidden">
+    
+    <section id="recipeSection" class="hidden">
       <h2 id="recipeTitle">Recipe Title</h2>
 
       <div class="recipe-grid">
@@ -46,25 +44,22 @@
         </div>
       </div>
 
-      <div class="recipe-card">
-        <h3>Assistant Answers</h3>
+      <div class="recipe-card answers-card">
+        <h3>✨ Assistant</h3>
         <div id="answerArea" class="answer-area">
           Ask a question about this recipe below.
         </div>
       </div>
     </section>
   </main>
-
-  <!-- Bottom chat/composer -->
+  
   <footer class="composer-wrap">
     <form id="composerForm" class="composer">
-      <input id="composerInput" type="text" placeholder="Paste a recipe URL..." />
+      <input id="composerInput" type="text" placeholder="Paste a recipe URL..." autocomplete="off" />
       <button id="submitBtn" type="submit">Unclutter</button>
     </form>
   </footer>
-
-
-
+  
   <script src="../static/JS/script.js"></script>
 </body>
 </html>
