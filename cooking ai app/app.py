@@ -1,7 +1,7 @@
 #receives the data from js and processes it
 import requests
-from bs4 import BeautifulSoup
-from gemini import generate # Import the generate function from gemini.py
+from bs4 import BeautifulSoup # BeautifulSoup is not used in the current version of app.py, but kept for context.
+import gemini # Import the gemini module
 
 # 1. Define custom headers to mimic a real browser
 headers = {
@@ -37,8 +37,8 @@ if response.status_code == 200:
     print("---------------------------------------------")
 
     # Call the Gemini AI to process the scraped text
-    # Pass the raw HTML content directly to the generate function.
-    json_output = generate(html_content)
+    # Pass the raw HTML content directly to the generate function from the gemini module.
+    json_output = gemini.generate(html_content)
     print("\n--- Gemini AI JSON Output ---")
     print(json_output)
     print("-----------------------------")
