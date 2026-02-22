@@ -1,8 +1,8 @@
 import os
-from google import genai
-from google.genai import types
 import json
 import logging # Import the logging module
+import google.generativeai as genai
+from google.generativeai import types
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
