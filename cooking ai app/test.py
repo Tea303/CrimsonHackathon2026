@@ -1,5 +1,5 @@
 import requests
-from playsound import playsound
+from playsound import playsound #pip install playsound==1.2.2
 
 ELEVENLABS_API_KEY = "sk_09bc2162234b0d86624fe4688fc7edd77efd45385b16eb1f"
 VOICE_ID = "EXAVITQu4vr4xnSDxMaL"
