@@ -12,9 +12,15 @@ const answerArea = document.getElementById("answerArea");
 const composerForm = document.getElementById("composerForm");
 const composerInput = document.getElementById("composerInput");
 const submitBtn = document.getElementById("submitBtn");
+const stopVoiceBtn = document.getElementById("stopVoiceBtn");
+let currentAudio = null;
 
 composerForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  
+  // Prevent submission if we are already waiting for a response
+  if (submitBtn.disabled) return;
+  
   const text = composerInput.value.trim();
   if (!text) return;
   
@@ -25,6 +31,10 @@ composerForm.addEventListener("submit", async (e) => {
     // After recipe loads: treat input as a question
     await handleQuestion(text);
   }
+});
+
+stopVoiceBtn.addEventListener("click", () => {
+  stopAudio();
 });
 
 async function handleUnclutter(url) {
@@ -78,6 +88,14 @@ async function handleQuestion(question) {
     
     const data = await response.json();
     answerArea.textContent = data.answer;
+    
+    // Play audio from server if available, otherwise fallback to browser TTS
+    if (data.audio_base64) {
+      playServerAudio(data.audio_base64);
+    } else {
+      speakText(data.answer);
+    }
+    
     composerInput.value = "";
     
     // Auto-scroll so user can see the new answer
@@ -133,4 +151,42 @@ function setLoading(isLoading, msg = "Loading...") {
     submitBtn.disabled = false;
     submitBtn.textContent = state.recipeLoaded ? "Ask" : "Unclutter";
   }
+}
+
+function stopAudio() {
+  // Stop server audio
+  if (currentAudio) {
+    currentAudio.pause();
+    currentAudio = null;
+  }
+  // Stop browser TTS
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+  stopVoiceBtn.classList.add("hidden");
+}
+
+function playServerAudio(base64String) {
+  stopAudio(); // Stop any previous audio
+  
+  const audioSrc = "data:audio/mp3;base64," + base64String;
+  currentAudio = new Audio(audioSrc);
+  
+  currentAudio.onended = () => {
+    stopVoiceBtn.classList.add("hidden");
+  };
+  
+  stopVoiceBtn.classList.remove("hidden");
+  currentAudio.play().catch(e => console.error("Audio playback failed:", e));
+}
+
+function speakText(text) {
+  if (!window.speechSynthesis) return;
+  
+  stopAudio();
+  
+  const utterance = new SpeechSynthesisUtterance(text);
+  stopVoiceBtn.classList.remove("hidden");
+  utterance.onend = () => stopVoiceBtn.classList.add("hidden");
+  window.speechSynthesis.speak(utterance);
 }

@@ -112,11 +112,11 @@ def ask_recipe():
     question = data.get('question')
     # It's crucial that the frontend sends the previously parsed recipe JSON
     # so the LLM has context for the question.
-    parsed_recipe = data.get('parsedRecipe') 
+    parsed_recipe = data.get('recipe_context') 
 
     if not question or not parsed_recipe:
-        logging.warning("Missing 'question' or 'parsedRecipe' in /ask-recipe request.")
-        return jsonify({"error": "Missing 'question' or 'parsedRecipe'"}), 400
+        logging.warning("Missing 'question' or 'recipe_context' in /ask-recipe request.")
+        return jsonify({"error": "Missing 'question' or 'recipe_context'"}), 400
 
     try:
         # Call the new Gemini function to answer the question about the recipe
