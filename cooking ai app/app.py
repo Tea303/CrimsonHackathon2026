@@ -1,6 +1,6 @@
 #receives the data from js and processes it
 import requests
-from bs4 import BeautifulSoup # BeautifulSoup is not used in the current version of app.py, but kept for context.
+from bs4 import BeautifulSoup
 import gemini # Import the gemini module
 
 # 1. Define custom headers to mimic a real browser
@@ -20,25 +20,22 @@ response = requests.get(url, headers=headers)
 if response.status_code == 200:
     print("Successfully bypassed the blocker!\n")
     
-    # 3. Parse the raw HTML text using BeautifulSoup
-    # The LLM will now "scan" the raw HTML content directly.
-    html_content = response.text
+    # 3. Parse and Clean the HTML using BeautifulSoup
+    soup = BeautifulSoup(response.text, 'html.parser')
 
-    # The BeautifulSoup object 'soup' is no longer used for pre-extraction
-    # as the LLM will now process the raw HTML.
-    # If you need BeautifulSoup for other tasks, you can uncomment the line below,
-    # but it won't be passed to the generate function for recipe extraction.
-    # soup = BeautifulSoup(response.text, 'html.parser')
+    # Remove script, style, and other irrelevant tags to reduce token count
+    for element in soup(["script", "style", "header", "footer", "nav", "aside", "meta", "iframe"]):
+        element.decompose()
 
-    print("--- Raw HTML Content for Gemini (Snippet) ---")
-    # Printing a snippet to avoid overwhelming the console with very long HTML.
-    # The full html_content is passed to the generate function.
-    print(html_content[:500] + "...") 
-    print("---------------------------------------------")
+    # Extract text with separators to maintain some structure
+    cleaned_content = soup.get_text(separator='\n', strip=True)
+
+    print("--- Cleaned Text Content for Gemini (Snippet) ---")
+    print(cleaned_content[:5000] + "...") 
+    print("-------------------------------------------------")
 
     # Call the Gemini AI to process the scraped text
-    # Pass the raw HTML content directly to the generate function from the gemini module.
-    json_output = gemini.generate(html_content)
+    json_output = gemini.generate(cleaned_content)
     print("\n--- Gemini AI JSON Output ---")
     print(json_output)
     print("-----------------------------")

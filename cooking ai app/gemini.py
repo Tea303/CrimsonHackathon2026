@@ -3,7 +3,7 @@ from google import genai
 from google.genai import types
 import json # Import the json module for parsing
 
-def generate(html_content):
+def generate(content):
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
         raise ValueError("GEMINI_API_KEY environment variable not set. Please set it before running the script.")
@@ -22,12 +22,12 @@ def generate(html_content):
     )
 
     # F-string allows you to dynamically pass the scraped text from Flask
-    prompt = f"""From the following HTML content, extract the recipe title, ingredients, and steps.
+    prompt = f"""From the following text, extract the recipe title, ingredients, and steps.
     Format as JSON with keys: "title", "ingredients" (list of strings), "steps" (list of strings).
-    Focus on the main recipe content and ignore navigation, ads, or other irrelevant HTML elements.
+    Focus on the main recipe content and ignore any remaining irrelevant text.
     
-    HTML CONTENT:
-    {html_content}
+    CONTENT:
+    {content}
     """
 
     try:
