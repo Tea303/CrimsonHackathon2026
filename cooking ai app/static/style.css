@@ -45,14 +45,14 @@ body {
 }
 
 .logo-wrap h1 {
-  font-size: 32px;
+  font-size: 50px;
   margin: 0;
   font-weight: 600;
 }
 
 /* Main content */
 .main-content {
-  max-width: 900px;
+  max-width: 1600px;
   margin: 0 auto;
   padding: 40px 20px 120px; /* bottom padding so chat box doesn't overlap */
 }
@@ -119,15 +119,19 @@ body {
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 14px 16px;
-  background: linear-gradient(to top, #212121 75%, rgba(33,33,33,0));
+  padding: 24px;
+  background: #212121;
+  border-top: 1px solid #333;
+  display: flex;
+  justify-content: center;
 }
 
 .composer {
-  max-width: 900px;
-  margin: 0 auto;
   display: flex;
-  gap: 10px;
+  gap: 12px;
+  width: 84%;
+  max-width: none;
+  margin: 0;
   background: #2a2a2a;
   border: 1px solid #3b3b3b;
   border-radius: 14px;
