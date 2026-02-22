@@ -27,7 +27,7 @@ def generate(content):
     )
 
     # Consider dropping to gemini-2.5-flash if 3-flash-preview still hits limits
-    model = "gemini-3-flash-preview"
+    model = "gemini-2.5-flash-lite"
     
     # We enforce JSON output so it plugs perfectly into your frontend JavaScript
     generate_content_config = types.GenerateContentConfig(
@@ -81,7 +81,7 @@ def answer_question_about_recipe(question: str, parsed_recipe_json: dict):
         return None
 
     client = genai.Client(api_key=api_key)
-    model = "gemini-3-flash-preview" # Or "gemini-1.5-flash" as a fallback
+    model = "gemini-2.5-flash-lite" # Switched to 2.5-flash-lite for consistency
 
     generate_content_config = types.GenerateContentConfig(
         response_mime_type="application/json",
@@ -111,4 +111,10 @@ def answer_question_about_recipe(question: str, parsed_recipe_json: dict):
 
 if __name__ == "__main__":
     # Test it with a tiny payload first!
-    generate("<html><body><h1>Test Recipe</h1><ul><li>Ingredient 1</li></ul><ol><li>Step 1</li></ol></body></html>")
+    print("--- Testing Recipe Parsing ---")
+    recipe_data = generate("<html><body><h1>Test Recipe</h1><ul><li>Ingredient 1</li></ul><ol><li>Step 1</li></ol></body></html>")
+    
+    if recipe_data:
+        print("\n--- Testing Question Answering ---")
+        answer = answer_question_about_recipe("What is the first step?", recipe_data)
+        print(json.dumps(answer, indent=2))
