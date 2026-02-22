@@ -1,9 +1,13 @@
 import requests
 from playsound import playsound
 import time
+import os
+from dotenv import load_dotenv
 
-ELEVENLABS_API_KEY = "sk_09bc2162234b0d86624fe4688fc7edd77efd45385b16eb1f"
-VOICE_ID = "EXAVITQu4vr4xnSDxMaL"
+load_dotenv()
+
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
+VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID")
 
 def speak(content):
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"

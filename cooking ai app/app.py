@@ -6,6 +6,10 @@ import gemini # Import the entire gemini module
 import logging # Import logging
 import json
 import base64
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app) # Mitigates Cross-Origin Resource Sharing errorss
@@ -80,8 +84,8 @@ def parse_recipe():
         logging.exception("An unexpected error occurred during Gemini processing.") # Logs traceback
         return jsonify({"error": f"An unexpected server error occurred: {str(e)}"}), 500 #
 
-ELEVENLABS_API_KEY = "sk_09bc2162234b0d86624fe4688fc7edd77efd45385b16eb1f"
-VOICE_ID = "EXAVITQu4vr4xnSDxMaL"
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
+VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID")
 
 def generate_audio(text):
     url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"

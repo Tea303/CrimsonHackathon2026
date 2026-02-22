@@ -2,10 +2,13 @@ import requests
 import base64
 import os
 import time
+from dotenv import load_dotenv
+
+load_dotenv()
 
 # Configuration
-ELEVENLABS_API_KEY = "sk_09bc2162234b0d86624fe4688fc7edd77efd45385b16eb1f"
-VOICE_ID = "EXAVITQu4vr4xnSDxMaL"
+ELEVENLABS_API_KEY = os.getenv("ELEVENLABS_API_KEY")
+VOICE_ID = os.getenv("ELEVENLABS_VOICE_ID")
 
 def generate_audio_base64(text):
     """

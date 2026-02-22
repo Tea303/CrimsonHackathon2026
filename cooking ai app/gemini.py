@@ -1,8 +1,11 @@
 import os
 import json
 import logging # Import the logging module
+from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+
+load_dotenv()
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 

@@ -4,3 +4,4 @@ beautifulsoup4
 flask-cors
 google-genai
 playsound==1.2.2
+python-dotenv
