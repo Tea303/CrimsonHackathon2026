@@ -117,6 +117,12 @@ function renderRecipe(recipe) {
   (recipe.ingredients || []).forEach((item) => {
     const li = document.createElement("li");
     li.textContent = item;
+    
+    // Add a click listener for interactivity
+    li.addEventListener("click", () => {
+      li.classList.toggle("completed");
+    });
+    
     ingredientsList.appendChild(li);
   });
 
