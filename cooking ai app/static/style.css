@@ -36,8 +36,16 @@ body {
   object-fit: contain;
 }
 
+.logo-large {
+  width: 300px;
+  height: 300px;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 24px;
+}
+
 .logo-wrap h1 {
-  font-size: 20px;
+  font-size: 32px;
   margin: 0;
   font-weight: 600;
 }
@@ -50,6 +58,12 @@ body {
 }
 
 .panel {
+  padding: 60px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
   background: #2a2a2a;
   border: 1px solid #3a3a3a;
   border-radius: 14px;
@@ -122,29 +136,45 @@ body {
 
 .composer input {
   flex: 1;
-  background: transparent;
-  border: none;
+  padding: 14px 16px;
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 8px;
   color: #ececec;
-  font-size: 15px;
+  font-size: 14px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.composer input:focus {
   outline: none;
+  border-color: #e53935;
+  box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.1);
 }
 
 .composer input::placeholder {
-  color: #9f9f9f;
+  color: #999;
 }
 
 .composer button {
-  background: #ef4444;
-  color: white;
+  padding: 14px 24px;
+  background: #e53935;
   border: none;
-  border-radius: 10px;
-  padding: 10px 14px;
-  cursor: pointer;
+  border-radius: 8px;
+  color: #fff;
   font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.2s, box-shadow 0.2s;
 }
 
 .composer button:hover {
-  opacity: 0.9;
+  background: #c62828;
+  box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.15);
+}
+
+.composer button:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.2);
 }
 
 .hidden {
