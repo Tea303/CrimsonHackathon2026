@@ -4,6 +4,8 @@ import requests # Keep requests for web scraping
 from bs4 import BeautifulSoup
 import gemini # Import the entire gemini module
 import logging # Import logging
+import json
+import base64
 
 app = Flask(__name__)
 CORS(app) # Mitigates Cross-Origin Resource Sharing errorss
@@ -13,6 +15,9 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 def parse_recipe():
     # 1. Extract the URL sent by JavaScript
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid or missing JSON body"}), 400
+
     target_url = data.get('url')
 
     if not target_url:
@@ -32,6 +37,28 @@ def parse_recipe():
 
     # 3. Clean the HTML
     soup = BeautifulSoup(response.text, 'html.parser')
+
+    for script in soup.find_all('script', type='application/ld+json'):
+        try:
+            json_ld_data = json.loads(script.string)
+            # JSON-LD can be a list or a dict. Search for the "Recipe" schema.
+            if isinstance(json_ld_data, list):
+                for item in json_ld_data:
+                    if item.get('@type') == 'Recipe':
+                        return jsonify({
+                            "title": item.get('name'),
+                            "ingredients": item.get('recipeIngredient'),
+                            "steps": [step.get('text') for step in item.get('recipeInstructions', [])]
+                        }), 200
+            elif json_ld_data.get('@type') == 'Recipe':
+                 return jsonify({
+                     "title": json_ld_data.get('name'),
+                     "ingredients": json_ld_data.get('recipeIngredient'),
+                     "steps": [step.get('text') for step in json_ld_data.get('recipeInstructions', [])]
+                 }), 200
+        except Exception:
+            continue # If JSON-LD fails, fallback to Gemini
+
     for element in soup(["script", "style", "header", "footer", "nav", "aside", "meta", "iframe"]):
         element.decompose()
     
@@ -53,9 +80,35 @@ def parse_recipe():
         logging.exception("An unexpected error occurred during Gemini processing.") # Logs traceback
         return jsonify({"error": f"An unexpected server error occurred: {str(e)}"}), 500 #
 
+ELEVENLABS_API_KEY = "sk_09bc2162234b0d86624fe4688fc7edd77efd45385b16eb1f"
+VOICE_ID = "EXAVITQu4vr4xnSDxMaL"
+
+def generate_audio(text):
+    url = f"https://api.elevenlabs.io/v1/text-to-speech/{VOICE_ID}"
+    headers = {
+        "xi-api-key": ELEVENLABS_API_KEY,
+        "Content-Type": "application/json",
+        "Accept": "audio/mpeg",
+    }
+    payload = {
+        "text": text,
+        "model_id": "eleven_multilingual_v2"
+    }
+    try:
+        response = requests.post(url, json=payload, headers=headers)
+        if response.status_code == 200:
+            # Return base64 encoded audio
+            return base64.b64encode(response.content).decode('utf-8')
+    except Exception as e:
+        logging.error(f"ElevenLabs API Error: {e}")
+    return None
+
 @app.route('/ask-recipe', methods=['POST'])
 def ask_recipe():
     data = request.get_json()
+    if not data:
+        return jsonify({"error": "Invalid or missing JSON body"}), 400
+
     question = data.get('question')
     # It's crucial that the frontend sends the previously parsed recipe JSON
     # so the LLM has context for the question.
@@ -70,6 +123,12 @@ def ask_recipe():
         ai_answer = gemini.answer_question_about_recipe(question, parsed_recipe)
 
         if ai_answer:
+            # Generate audio for the answer
+            answer_text = ai_answer.get('answer')
+            if answer_text:
+                audio_b64 = generate_audio(answer_text)
+                if audio_b64:
+                    ai_answer['audio_base64'] = audio_b64
             return jsonify(ai_answer), 200
         else:
             return jsonify({"error": "AI failed to answer the question. Check server logs for details."}), 500
@@ -78,5 +137,5 @@ def ask_recipe():
         return jsonify({"error": f"An unexpected server error occurred: {str(e)}"}), 500
 
 if __name__ == '__main__':
-    # Starts the server on http://127.0.0.1:5000
-    app.run(debug=True)
+    # Keep debug=True for error logs, but turn off the reloader
+    app.run(debug=True, use_reloader=False)

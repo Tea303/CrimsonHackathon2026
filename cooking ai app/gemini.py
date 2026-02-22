@@ -6,6 +6,17 @@ from google.genai import types
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+def clean_json_text(text):
+    """Cleans JSON text by removing Markdown code blocks."""
+    text = text.strip()
+    if text.startswith("```json"):
+        text = text[7:]
+    elif text.startswith("```"):
+        text = text[3:]
+    if text.endswith("```"):
+        text = text[:-3]
+    return text.strip()
+
 def generate(content):
     api_key = os.environ.get("GEMINI_API_KEY")
     if not api_key:
@@ -42,7 +53,8 @@ def generate(content):
         
         try:
             # Attempt to parse the response text as JSON
-            json_output = json.loads(response.text) # Ensure response.text is used
+            cleaned_text = clean_json_text(response.text)
+            json_output = json.loads(cleaned_text) # Ensure response.text is used
             logging.info(f"Gemini AI JSON Output:\n{json.dumps(json_output, indent=2)}") # Use logging
             return json_output # Return the parsed JSON object
         except json.JSONDecodeError as json_e:
@@ -91,7 +103,8 @@ def answer_question_about_recipe(question: str, parsed_recipe_json: dict):
 
     try:
         response = client.models.generate_content(model=model, contents=prompt, config=generate_content_config)
-        return json.loads(response.text)
+        cleaned_text = clean_json_text(response.text)
+        return json.loads(cleaned_text)
     except Exception as e:
         logging.error(f"Error calling Gemini API for question answering: {e}")
         return None
